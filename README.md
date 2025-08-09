@@ -17,7 +17,7 @@ The Lost and Found Website is a simple full-stack application that allows users 
 ## Technology Stack
 
 * **Frontend:** HTML, CSS, JavaScript
-* **Backend:** Node.js with Express / Python with Flask
+* **Backend:** Node.js with Express
 * **Hosting:** Can be deployed locally or on cloud platforms
 
 ## Usage

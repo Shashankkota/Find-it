@@ -17,7 +17,7 @@ The Lost and Found Website is a simple full-stack application that allows users 
 ## Technology Stack
 
 * **Frontend:** HTML, CSS, JavaScript
-* **Backend:** Not yet implemented , will be done soon.
+* **Backend:** Virtual Supabase
 * **Hosting:** deployed on vercel
 
 ## Usage

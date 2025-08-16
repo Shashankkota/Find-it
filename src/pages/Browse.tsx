@@ -5,15 +5,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Search, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Item } from "@/types/item";
+import { useItems } from "@/hooks/useItems";
 import ItemCard from "@/components/ItemCard";
 import Header from "@/components/Header";
 import ItemModal from "@/components/ItemModal";
 
 const Browse = () => {
   const navigate = useNavigate();
-  const [items] = useLocalStorage<Item[]>('lostFoundItems', []);
+  const { items, loading, error } = useItems();
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<'all' | 'lost' | 'found'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
@@ -145,7 +145,17 @@ const Browse = () => {
         </div>
 
         {/* Items Grid */}
-        {filteredItems.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Loading items...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-destructive mb-4">Error loading items: {error}</p>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
+          </div>
+        ) : filteredItems.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredItems.map((item) => (
               <ItemCard

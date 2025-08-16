@@ -8,15 +8,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ArrowLeft, Save } from "lucide-react";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { Item, ItemFormData } from "@/types/item";
+import { ItemFormData } from "@/types/item";
+import { useItems } from "@/hooks/useItems";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 
 const Submit = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [items, setItems] = useLocalStorage<Item[]>('lostFoundItems', []);
+  const { addItem, loading } = useItems();
   
   const [formData, setFormData] = useState<ItemFormData>({
     type: 'lost',
@@ -43,7 +43,7 @@ const Submit = () => {
     'Other'
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.description || !formData.location || !formData.date || !formData.contactName || !formData.category) {
@@ -64,20 +64,21 @@ const Submit = () => {
       return;
     }
 
-    const newItem: Item = {
-      id: Date.now().toString(),
-      ...formData,
-      createdAt: new Date().toISOString()
-    };
-
-    setItems(prev => [newItem, ...prev]);
+    const result = await addItem(formData);
     
-    toast({
-      title: "Item Reported Successfully!",
-      description: `Your ${formData.type} item "${formData.name}" has been added to our database.`
-    });
-
-    navigate('/browse');
+    if (result.success) {
+      toast({
+        title: "Item Reported Successfully!",
+        description: `Your ${formData.type} item "${formData.name}" has been added to our database.`
+      });
+      navigate('/browse');
+    } else {
+      toast({
+        title: "Error",
+        description: result.error || "Failed to add item. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleInputChange = (field: keyof ItemFormData, value: string) => {
@@ -240,9 +241,9 @@ const Submit = () => {
                 </p>
               </div>
 
-              <Button type="submit" className="w-full" size="lg" variant="hero">
+              <Button type="submit" className="w-full" size="lg" variant="hero" disabled={loading}>
                 <Save className="h-4 w-4 mr-2" />
-                Submit Report
+                {loading ? "Submitting..." : "Submit Report"}
               </Button>
             </form>
           </CardContent>
